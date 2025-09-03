@@ -6,7 +6,7 @@ plugins {
 }
 
 def getLatestFridaVersion = {
-    def connection = new URL("https://api.github.com/repos/frida/frida/releases/latest").openConnection()
+    def connection = new URL("https://api.github.com/repos/Ylarod/Florida/releases/latest").openConnection()
 
     connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
     connection.setRequestProperty("Accept", "application/vnd.github+json")
@@ -104,9 +104,9 @@ android {
                 def tempDir = new File(buildDir, "frida-temp")
                 tempDir.mkdirs()
 
-                def injectorName = "frida-inject-${fridaVersion}-${arch}.xz"
+                def injectorName = "florida-inject-${fridaVersion}-${arch}.gz"
                 def compressedInjector = new File(tempDir, injectorName)
-                def url = "https://github.com/frida/frida/releases/download/${fridaVersion}/${injectorName}"
+                def url = "https://github.com/Ylarod/Florida/releases/download/${fridaVersion}/${injectorName}"
 
                 try {
                     download {
@@ -120,14 +120,14 @@ android {
                         return
                     }
 
-                    def XZInputStream = loader.loadClass('org.tukaani.xz.XZInputStream')
-                    def extractedFile = new File(compressedInjector.absolutePath.replace('.xz', ''))
-
+                    def GZIPInputStream = loader.loadClass('java.util.zip.GZIPInputStream')
+                    def extractedFile = new File(compressedInjector.absolutePath.replace('.gz', ''))
+                    
                     compressedInjector.withInputStream { fis ->
-                        def xzIn = XZInputStream.getConstructor(InputStream.class).newInstance(fis)
-                        xzIn.withStream { xzis ->
+                        def gzIn = GZIPInputStream.getConstructor(InputStream.class).newInstance(fis)
+                        gzIn.withStream { gzis ->
                             extractedFile.withOutputStream { fos ->
-                                fos << xzis
+                                fos << gzis
                             }
                         }
                     }
